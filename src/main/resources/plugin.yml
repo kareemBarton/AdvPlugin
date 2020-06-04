@@ -1,44 +1,52 @@
 name: AdvPlugin
-main: com.github.kareemBarton.AdvPlugin.AdvPlugin
-version: 0.0.1-SNAPSHOT
+version: 0.0.2
+main: AdvPlugin.AdvPlugin
 commands:
-   setGroup:
-      description: Sets the group no. of a player.
-      usage: /<command>[player][group]
-      permission: AdvPlugin.setGroup
-      permission-message: You don't have <permission>
-   setRank:
-      description: Sets the rank of a player.
-      usage: /<command>[player][rank]
-      permission: AdvPlugin.setRank
-      permission-message: You don't have <permission>
-    joinAdv:
-      description: Join the Adventure event
-      usage: /<command>
-      permission: AdvPlugin.joinAdv
-      permission-message: You don't have <permission>
-    createGame:
-      description: Create the Adventure event
-      usage: /<command>
-      permission: AdvPlugin.createGame
-      permission-message: You don't have <permission>
-    destroyGame:
-      description: Destroy the Adventure event
-      usage: /<command>
-      permission: AdvPlugin.destroyGame
-      permission-message: You don't have <permission>
-    leaveAdv:
-      description: Leave the Adv event
-      usage: /<command>
-      permission: AdvPlugin.leaveAdv
-      permission-message: You don't have <permission>
-    setGroupHome:
-      description: Set the home for a group
-      usage: /<command>
-      permission: AdvPlugin.setGroupHome
-      permission-message: You don't have <permission>
-    startGame:
-      description: syart the event
-      usage: /<command>
-      permission: AdvPlugin.startGame
-      permission-message: You don't have <permission>
+
+  setGroup:
+    description: Sets the group no. of a player.
+    usage:
+    permission: AdvPlugin.setGroup
+    permission-message: You don't have permission
+
+  setRank:
+    description: Sets the rank of a player.
+    usage:
+    permission: AdvPlugin.setRank
+    permission-message: You don't have permission
+
+  joinAdv:
+    description: Join the Adventure event
+    usage:
+    permission: AdvPlugin.joinAdv
+    permission-message: You don't have permission
+ 
+  createGame:
+    description: Create the Adventure event
+    usage:
+    permission: AdvPlugin.createGame
+    permission-message: You don't have permission
+
+  destroyGame:
+    description: Destroy the Adventure event
+    usage:
+    permission: AdvPlugin.destroyGame
+    permission-message: You don't have permission
+
+  leaveAdv:
+    description: Leave the Adv event
+    usage:
+    permission: AdvPlugin.leaveAdv
+    permission-message: You don't have permission
+
+  setGroupHome:
+    description: Set the home for a group
+    usage: setgrouphome [group, x,y,z]
+    permission: AdvPlugin.setGroupHome
+    permission-message: You don't have permission
+
+  startGame:
+    description: start the event
+    usage:
+    permission: AdvPlugin.startGame
+    permission-message: You don't have permission

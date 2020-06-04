@@ -9,29 +9,29 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public final class AdvEventListener implements Listener 
 {
-	AdvPlugin plugin;
+	private final AdvPlugin calledplugin;
     public AdvEventListener(AdvPlugin plugin) //constructor sets up a listener on server events
     {
-    	this.plugin = plugin;
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    	calledplugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.NORMAL)
     public void login(PlayerLoginEvent event) //Player logs on
     {
-       plugin.playerlist.add(event.getPlayer());
+    	event.getPlayer().sendMessage("Welcome!");
+        calledplugin.playerlist.add(event.getPlayer());
     }
     
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.NORMAL)
     public void logout(PlayerQuitEvent event)// player leaves
     {
     	Player player = event.getPlayer();
-    		if(plugin.playerlist.contains(player))
+    		if(calledplugin.playerlist.contains(player))
     		{
-    			plugin.playerlist.remove(player);
-    			if(plugin.AdvPlayersList.contains(player))
+    			calledplugin.playerlist.remove(player);
+    			if(calledplugin.AdvPlayersList.contains(player))
     			{
-    				plugin.AdvPlayersList.remove(player);
+    				calledplugin.AdvPlayersList.remove(player);
     			}
     		}
     	

@@ -11,11 +11,11 @@ import org.bukkit.entity.Player;
 
 public class AdvCommandExecutor implements CommandExecutor
 {
-	private final AdvPlugin plugin;
+	private final AdvPlugin calledplugin;
 
 	public AdvCommandExecutor(AdvPlugin plugin) 
 	{
-		this.plugin = plugin; 
+		this.calledplugin = plugin; 
 	}
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) 
@@ -71,12 +71,16 @@ public class AdvCommandExecutor implements CommandExecutor
 				}
 				else
 				{
-					for(Player player: plugin.playerlist) //Iterate through player list to find the mentioned player
+					for(Player player: calledplugin.playerlist) //Iterate through player list to find the mentioned player
 					{
 						if(player.getName().contentEquals(args[0]))
 						{
-							player.addScoreboardTag(args[1]);
-							return true;
+							if(!calledplugin.AdvPlayersList.isEmpty())
+							{
+								player.addScoreboardTag(args[1]);
+								return true;
+							}
+							
 						}
 						else
 						{
@@ -90,9 +94,9 @@ public class AdvCommandExecutor implements CommandExecutor
 	//The method for /joinAdv
 	private boolean eventJoin(CommandSender sender, Command command, String name, String args[])
 	{
-		if(sender instanceof Player && plugin.event == true)//is sender player?, is the game actually on?
+		if(sender instanceof Player && calledplugin.event == true)//is sender player?, is the game actually on?
 		{
-			if(plugin.AdvPlayersList.contains(sender))//has the player already joined?
+			if(calledplugin.AdvPlayersList.contains(sender))//has the player already joined?
 			{
 				sender.sendMessage("You have already joined the Pure Quests!");
 				return false;
@@ -100,13 +104,13 @@ public class AdvCommandExecutor implements CommandExecutor
 			else
 			{
 				Player player = (Player) sender;
-				plugin.AdvPlayersList.add(player);
+				calledplugin.AdvPlayersList.add(player);
 				player.sendMessage("Welcome to the Pure Quests!");
 				player.sendMessage("Please wait for the event Admins to teleport you, dont move");
-				plugin.getServer().dispatchCommand(player, "saveInv " + player.getName());
-				plugin.getServer().getPlayer(player.getName()).teleport(plugin.getServer().getWorld("AdventureWorld").getSpawnLocation());
-				plugin.getServer().getPlayer(player.getName()).setGameMode(GameMode.ADVENTURE);
-				if(player.getLocation() == plugin.getServer().getWorld("AdventureWorld").getSpawnLocation())//Was the teleportation successful?
+				calledplugin.getServer().dispatchCommand(player, "saveInv " + player.getName());
+				calledplugin.getServer().getPlayer(player.getName()).teleport(calledplugin.getServer().getWorld("AdventureWorld").getSpawnLocation());
+				calledplugin.getServer().getPlayer(player.getName()).setGameMode(GameMode.ADVENTURE);
+				if(player.getLocation() == calledplugin.getServer().getWorld("AdventureWorld").getSpawnLocation())//Was the teleportation successful?
 				{
 					player.sendMessage("Teleportation successful");
 					return true;
@@ -114,7 +118,7 @@ public class AdvCommandExecutor implements CommandExecutor
 				else
 				{
 					player.sendMessage("Sorry you moved teleportation was cancelled, join again.");
-					plugin.AdvPlayersList.remove(player);
+					calledplugin.AdvPlayersList.remove(player);
 					return false;
 				}
 				
@@ -137,10 +141,16 @@ public class AdvCommandExecutor implements CommandExecutor
 	{
 		if(sender.hasPermission("AdvPlugin.createGame"))
 		{
-			if(plugin.event == false)
+			if(calledplugin.event == false)
 			{
-				plugin.event = true;
-				return true;
+				
+				if(!calledplugin.playerlist.isEmpty())
+				{
+					calledplugin.event = true;
+					sender.sendMessage("the Game has been created!");
+					return true;
+				}
+				sender.sendMessage("No players online!");
 			}
 		}
 		return false;
@@ -150,13 +160,13 @@ public class AdvCommandExecutor implements CommandExecutor
 	{
 		if(sender.hasPermission("AdvPlugin.destroyGame"))
 		{
-			if(plugin.event == true)
+			if(calledplugin.event == true)
 			{
-				plugin.event = false;
-				for(Player player: plugin.AdvPlayersList)
+				calledplugin.event = false;
+				for(Player player: calledplugin.AdvPlayersList)
 				{
-					player.teleport(new Location(plugin.getServer().getWorld("World"),plugin.getServer().getWorld("World").getSpawnLocation().getX(),plugin.getServer().getWorld("World").getSpawnLocation().getY(),plugin.getServer().getWorld("World").getSpawnLocation().getZ()));
-					plugin.AdvPlayersList.remove(player);
+					player.teleport(new Location(calledplugin.getServer().getWorld("World"),calledplugin.getServer().getWorld("World").getSpawnLocation().getX(),calledplugin.getServer().getWorld("World").getSpawnLocation().getY(),calledplugin.getServer().getWorld("World").getSpawnLocation().getZ()));
+					calledplugin.AdvPlayersList.remove(player);
 					player.setGameMode(GameMode.SURVIVAL);
 				}
 			}
@@ -168,12 +178,12 @@ public class AdvCommandExecutor implements CommandExecutor
 	{
 		if(sender instanceof Player)
 		{
-			if(plugin.event = true && plugin.AdvPlayersList.contains((Player)sender))
+			if(calledplugin.event = true && calledplugin.AdvPlayersList.contains((Player)sender))
 			{
 				sender.sendMessage("You are leaving the Pure Quests. :(");
-				plugin.AdvPlayersList.remove((Player) sender);
+				calledplugin.AdvPlayersList.remove((Player) sender);
 				Player player = (Player) sender;
-				player.teleport(new Location(plugin.getServer().getWorld("World"),plugin.getServer().getWorld("World").getSpawnLocation().getX(),plugin.getServer().getWorld("World").getSpawnLocation().getY(),plugin.getServer().getWorld("World").getSpawnLocation().getZ()));
+				player.teleport(new Location(calledplugin.getServer().getWorld("World"),calledplugin.getServer().getWorld("World").getSpawnLocation().getX(),calledplugin.getServer().getWorld("World").getSpawnLocation().getY(),calledplugin.getServer().getWorld("World").getSpawnLocation().getZ()));
 				player.setGameMode(GameMode.SURVIVAL);
 				return true;
 			}
@@ -186,74 +196,80 @@ public class AdvCommandExecutor implements CommandExecutor
 		//teleports players in the event to their specific start locations
 		if(sender.hasPermission("AvPlugin.startGame"))
 		{
-			plugin.getServer().broadcastMessage("Dont move, you will be teleported!");
-			for(Player player: plugin.AdvPlayersList)
+			if(!calledplugin.AdvPlayersList.isEmpty())
 			{
-				if(player.getScoreboardTags().contains("1"))
+				calledplugin.getServer().broadcastMessage("Dont move, you will be teleported!");
+				for(Player player: calledplugin.AdvPlayersList)
 				{
-					player.teleport(plugin.group1);
+					if(player.getScoreboardTags().contains("1"))
+					{
+						player.teleport(calledplugin.group1);
+					}
+					if(player.getScoreboardTags().contains("2"))
+					{
+						player.teleport(calledplugin.group2);
+					}
+					if(player.getScoreboardTags().contains("3"))
+					{
+						player.teleport(calledplugin.group3);
+					}
+					if(player.getScoreboardTags().contains("4"))
+					{
+						player.teleport(calledplugin.group4);
+					}
+					calledplugin.getServer().broadcastMessage("The Quest has begun! Survive and Win!");
+					
+					return true;
 				}
-				if(player.getScoreboardTags().contains("2"))
-				{
-					player.teleport(plugin.group2);
-				}
-				if(player.getScoreboardTags().contains("3"))
-				{
-					player.teleport(plugin.group3);
-				}
-				if(player.getScoreboardTags().contains("4"))
-				{
-					player.teleport(plugin.group4);
-				}
-				plugin.getServer().broadcastMessage("The Quest has begun! Survive and Win!");
 				
-				return true;
 			}
+			sender.sendMessage("There are no players online!");
+			
 		}
 		return false;
 	}
 	public boolean setGroupHome(CommandSender sender, String args[])
 	{
-		if(sender.hasPermission("AdvPlugin.setGroupHomes"))
-		{
 			if(args.length == 4)
 			{
-				if(args[0] == "1")
+				if(args[0].equalsIgnoreCase("1"))
 				{
-					plugin.group1.setX(Integer.parseInt(args[1]));
-					plugin.group1.setY(Integer.parseInt(args[2]));
-					plugin.group1.setZ(Integer.parseInt(args[3]));
+					calledplugin.group1.setX(Integer.parseInt(args[1]));
+					calledplugin.group1.setY(Integer.parseInt(args[2]));
+					calledplugin.group1.setZ(Integer.parseInt(args[3]));
 					sender.sendMessage("Group 1" + " home has been set to "+ args[1] + ","+ args[2] + "," + args[3]);
 					return true;
 				}
-				if(args[0] == "2")
+				if(args[0].equalsIgnoreCase("2"))
 				{
-					plugin.group2.setX(Integer.parseInt(args[1]));
-					plugin.group2.setY(Integer.parseInt(args[2]));
-					plugin.group2.setZ(Integer.parseInt(args[3]));
+					calledplugin.group2.setX(Integer.parseInt(args[1]));
+					calledplugin.group2.setY(Integer.parseInt(args[2]));
+					calledplugin.group2.setZ(Integer.parseInt(args[3]));
 					sender.sendMessage("Group 2" + " home has been set to "+ args[1] + ","+ args[2] + "," + args[3]);
 					return true;
 				}
-				if(args[0] == "3")
+				if(args[0].equalsIgnoreCase("3"))
 				{
-					plugin.group3.setX(Integer.parseInt(args[1]));
-					plugin.group3.setY(Integer.parseInt(args[2]));
-					plugin.group3.setZ(Integer.parseInt(args[3]));
+					calledplugin.group3.setX(Integer.parseInt(args[1]));
+					calledplugin.group3.setY(Integer.parseInt(args[2]));
+					calledplugin.group3.setZ(Integer.parseInt(args[3]));
 					sender.sendMessage("Group 3" + " home has been set to "+ args[1] + ","+ args[2] + "," + args[3]);
 					return true;
 				}
-				if(args[0] == "4")
+				if(args[0].equalsIgnoreCase("4"))
 				{
-					plugin.group4.setX(Integer.parseInt(args[1]));
-					plugin.group4.setY(Integer.parseInt(args[2]));
-					plugin.group4.setZ(Integer.parseInt(args[3]));
+					calledplugin.group4.setX(Integer.parseInt(args[1]));
+					calledplugin.group4.setY(Integer.parseInt(args[2]));
+					calledplugin.group4.setZ(Integer.parseInt(args[3]));
 					sender.sendMessage("Group 4" + " home has been set to "+ args[1] + ","+ args[2] + "," + args[3]);
 					return true;
 				}
+				sender.sendMessage("No group specified!");
 			}
-			sender.sendMessage("Wrong number of arguments!");
-			return false;
-		}
+			if(args.length != 4)
+			{
+				sender.sendMessage("Wrong number of arguments!");
+			}
 		return false;
 	}
 }

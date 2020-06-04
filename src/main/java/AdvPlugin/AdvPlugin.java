@@ -1,4 +1,5 @@
 package AdvPlugin;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -8,8 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 public class AdvPlugin extends JavaPlugin
 {
-	List <Player> playerlist;//online players
-	List <Player> AdvPlayersList;//online players who have joined the event
+	List <Player> playerlist = new ArrayList<Player>();//online players
+	List <Player> AdvPlayersList = new ArrayList<Player>();//online players who have joined the event
 	Boolean event = false;
 	World adventureWorld = this.getServer().getWorld("AdventureWorld");
 	Location group1 = new Location(this.getServer().getWorld("AdventureWorld"),0,200,0);
@@ -20,7 +21,7 @@ public class AdvPlugin extends JavaPlugin
 	public void onEnable()
 	{
 		getLogger().info("The AdvPlugin is being enabled!");
-		new AdvEventListener(this);
+		this.getServer().getPluginManager().registerEvents(new AdvEventListener(this),this);
 		this.getCommand("setGroup").setExecutor(new AdvCommandExecutor(this));
 		this.getCommand("setRank").setExecutor(new AdvCommandExecutor(this));
 		this.getCommand("joinAdv").setExecutor(new AdvCommandExecutor(this));
@@ -31,7 +32,7 @@ public class AdvPlugin extends JavaPlugin
 		this.getCommand("startGame").setExecutor(new AdvCommandExecutor(this));
 		for (Player player : Bukkit.getServer().getOnlinePlayers()) 
 		{	
-		    playerlist.add(player);  
+		    playerlist.add(player); 
 		}
 		
 	
