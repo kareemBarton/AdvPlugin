@@ -8,6 +8,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class AdvCommandExecutor implements CommandExecutor
 {
@@ -94,36 +95,65 @@ public class AdvCommandExecutor implements CommandExecutor
 	//The method for /joinAdv
 	private boolean eventJoin(CommandSender sender, Command command, String name, String args[])
 	{
+		
 		if(sender instanceof Player && calledplugin.event == true)//is sender player?, is the game actually on?
 		{
-			if(calledplugin.AdvPlayersList.contains(sender))//has the player already joined?
+			Player player = (Player) sender;
+			Boolean emptyInv = false;
+			for(ItemStack item : player.getInventory().getContents())
 			{
-				sender.sendMessage("You have already joined the Pure Quests!");
-				return false;
+			    if(item != null)
+			    {
+			    	emptyInv = false;
+			    }
+			    
 			}
-			else
+			emptyInv = true;
+			for(ItemStack item : player.getInventory().getArmorContents())
 			{
-				Player player = (Player) sender;
-				calledplugin.AdvPlayersList.add(player);
-				player.sendMessage("Welcome to the Pure Quests!");
-				player.sendMessage("Please wait for the event Admins to teleport you, dont move");
-				calledplugin.getServer().dispatchCommand(player, "saveInv " + player.getName());
-				calledplugin.getServer().getPlayer(player.getName()).teleport(calledplugin.getServer().getWorld("AdventureWorld").getSpawnLocation());
-				calledplugin.getServer().getPlayer(player.getName()).setGameMode(GameMode.ADVENTURE);
-				if(player.getLocation() == calledplugin.getServer().getWorld("AdventureWorld").getSpawnLocation())//Was the teleportation successful?
+			    if(item != null)
+			    {
+			    	emptyInv = false;
+			    }
+			}
+			emptyInv = true;
+			
+			
+			if(emptyInv == true)
+			{
+				
+				if(calledplugin.AdvPlayersList.contains(sender))//has the player already joined?
 				{
-					player.sendMessage("Teleportation successful");
-					return true;
-				}
-				else
-				{
-					player.sendMessage("Sorry you moved teleportation was cancelled, join again.");
-					calledplugin.AdvPlayersList.remove(player);
+					sender.sendMessage("You have already joined the Pure Quests!");
 					return false;
 				}
-				
+				else
+				{	
+					calledplugin.AdvPlayersList.add(player);
+					player.sendMessage("Welcome to the Pure Quests!");
+					player.sendMessage("Please wait for the event Admins to teleport you, dont move");
+					calledplugin.getServer().dispatchCommand(player, "saveInv " + player.getName());
+					calledplugin.getServer().getPlayer(player.getName()).teleport(calledplugin.getServer().getWorld("AdventureWorld").getSpawnLocation());
+					calledplugin.getServer().getPlayer(player.getName()).setGameMode(GameMode.ADVENTURE);
+					if(player.getLocation() == calledplugin.getServer().getWorld("AdventureWorld").getSpawnLocation())//Was the teleportation successful?
+					{
+						player.sendMessage("Teleportation successful");
+						return true;
+					}
+					else
+					{
+						player.sendMessage("Sorry you moved teleportation was cancelled, join again.");
+						calledplugin.AdvPlayersList.remove(player);
+						return false;
+					}
+					
+				}
 			}
+			player.sendMessage("You must have an empty inventory!");
+			return false;
+			
 		}
+		
 		else
 		{
 			if(sender instanceof Player)// is the sender a player?
